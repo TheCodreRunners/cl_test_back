@@ -1,82 +1,106 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import {
+  AuthResponse,
+  LoginRequest,
+  JwtPayload,
+} from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: registerDto.email },
-    });
-
+  async register(createUserDto: CreateUserDto): Promise<AuthResponse> {
+    const existingUser = await this.usersService.findByEmail(
+      createUserDto.email,
+    );
     if (existingUser) {
-      throw new ConflictException({
-        error: {
-          code: 'EMAIL_ALREADY_EXISTS',
-          message: 'Email already exists',
-        },
-      });
+      throw new ConflictException('Email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
-
-    const user = await this.prisma.user.create({
-      data: {
-        name: registerDto.name,
-        email: registerDto.email,
-        password: hashedPassword,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    const user = await this.usersService.create({
+      ...createUserDto,
     });
 
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+    const payload: JwtPayload = { sub: user.id, email: user.email };
+    const token = this.jwtService.sign(payload);
 
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
       token,
     };
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
-    
+  async login(loginRequest: LoginRequest): Promise<AuthResponse> {
+    const user = await this.usersService.findByEmail(loginRequest.email);
+
     if (!user) {
-      throw new UnauthorizedException({
-        error: {
-          code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials',
-        },
-      });
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+    const isPasswordValid = await bcrypt.compare(
+      loginRequest.password,
+      user.password,
+    );
+    // console.log(
+    //   'isPasswordValid:',
+    //   isPasswordValid,
+    //   loginRequest.password,
+    //   user.password,
+    // );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-    return { token };
+    const payload: JwtPayload = { sub: user.id, email: user.email };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      token,
+    };
   }
 
-  async validateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email, deletedAt: null },
-    });
+  async validateUser(userId: string): Promise<any> {
+    return this.usersService.findById(userId);
+  }
 
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+  async validateUserCredentials(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+    console.log('isPasswordValid:', user);
+    if (!user) {
+      return null;
     }
-    return null;
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('isPasswordValid:', isPasswordValid);
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    const { password: _, ...result } = user;
+    return result;
   }
 }

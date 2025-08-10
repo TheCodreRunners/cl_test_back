@@ -5,7 +5,9 @@ import { createTestUsersSeeder } from './seeds/create-test-users.seeder';
 
 const prisma = new PrismaClient();
 
-const seeders = [
+type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
+
+const seeders: Array<(client: TransactionClient) => Promise<void>> = [
   createAdminUserSeeder,
   createBooksSeeder,
   createTestUsersSeeder,
@@ -32,7 +34,7 @@ async function main() {
 
 
 
-      await prisma.$transaction(
+    await prisma.$transaction(
         async (tx) => {
           await seeder(tx);
           await tx.seeders.create({
@@ -43,10 +45,7 @@ async function main() {
         },
         { timeout: 60000 },
       );
-
-  
     }
-
     
   } catch (error) {
     throw error;

@@ -94,4 +94,27 @@ export class UsersService {
     
     return await this.usersRepository.deleteUser(id);
   }
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findByEmail(email);
+  }
+
+  async findById(id: string) {
+    return await this.usersRepository.findUserById(id);
+  }
+
+  async createWithHashedPassword(createUserDto: CreateUserDto) {
+    const existingUser = await this.usersRepository.findByEmail(createUserDto.email);
+    
+    if (existingUser) {
+      throw new ConflictException({
+        error: {
+          code: 'EMAIL_ALREADY_EXISTS',
+          message: 'Email already exists',
+        },
+      });
+    }
+    
+    return await this.usersRepository.createUser(createUserDto);
+  }
 }
