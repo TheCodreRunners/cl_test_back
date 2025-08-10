@@ -1,0 +1,36 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('Starting seed...');
+
+  const books = [
+    { name: 'The Great Gatsby' },
+    { name: 'To Kill a Mockingbird' },
+    { name: '1984' },
+    { name: 'Pride and Prejudice' },
+    { name: 'The Catcher in the Rye' },
+    { name: 'Lord of the Flies' },
+    { name: 'Animal Farm' },
+    { name: 'Brave New World' },
+    { name: 'Jane Eyre' },
+    { name: 'Wuthering Heights' },
+  ];
+
+  await prisma.book.createMany({
+    data: books,
+    skipDuplicates: true,
+  });
+
+  console.log('Seed completed successfully!');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
