@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Starting seed...');
 
   const books = [
     { name: 'The Great Gatsby' },
@@ -23,7 +22,6 @@ async function main() {
     skipDuplicates: true,
   });
 
-  console.log('Seed completed successfully!');
 }
 
 main()

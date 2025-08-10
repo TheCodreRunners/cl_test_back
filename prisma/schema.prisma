@@ -45,3 +45,11 @@ model UserBook {
   @@id([userId, bookId])
   @@map("user_books")
 }
+
+model Seeders {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("seeders")
+}

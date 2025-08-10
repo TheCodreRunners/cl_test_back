@@ -21,7 +21,10 @@
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
     "db:seed": "npx prisma db seed",
-    "db:studio": "npx prisma studio"
+    "db:seed:advanced": "ts-node prisma/seeders/index.ts",
+    "db:seed:create": "ts-node src/config/prisma/seeders/create.ts",
+    "db:studio": "npx prisma studio",
+    "db:reset": "npx prisma migrate reset --force"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.850.0",
