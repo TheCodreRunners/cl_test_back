@@ -13,6 +13,9 @@ export class BooksRepository {
       select: {
         id: true,
         name: true,
+        author: true,
+        description: true,
+        cover: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -25,6 +28,9 @@ export class BooksRepository {
       select: {
         id: true,
         name: true,
+        author: true,
+        description: true,
+        cover: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -42,6 +48,9 @@ export class BooksRepository {
         select: {
           id: true,
           name: true,
+          author: true,
+          description: true,
+          cover: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -68,6 +77,9 @@ export class BooksRepository {
       select: {
         id: true,
         name: true,
+        author: true,
+        description: true,
+        cover: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -81,6 +93,9 @@ export class BooksRepository {
       select: {
         id: true,
         name: true,
+        author: true,
+        description: true,
+        cover: true,
         createdAt: true,
         updatedAt: true,
         deletedAt: true,

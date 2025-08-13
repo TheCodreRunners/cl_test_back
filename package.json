@@ -23,8 +23,7 @@
     "db:seed": "npx prisma db seed",
     "db:seed:advanced": "ts-node prisma/seeders/index.ts",
     "db:seed:create": "ts-node src/config/prisma/seeders/create.ts",
-    "db:studio": "npx prisma studio",
-    "db:reset": "npx prisma migrate reset --force"
+    "db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.850.0",
@@ -36,9 +35,13 @@
     "@nestjs/passport": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.12.0",
+    "@types/minio": "^7.1.0",
+    "@types/multer": "^2.0.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "minio": "^8.0.5",
+    "multer": "^2.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

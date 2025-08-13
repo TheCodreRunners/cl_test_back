@@ -30,17 +30,20 @@ export class MeRepository {
 
   async getUserBooks(userId: string) {
     const userBooks = await this.prisma.userBook.findMany({
-      where: { 
+      where: {
         userId,
         book: {
-          deletedAt: null
-        }
+          deletedAt: null,
+        },
       },
       include: {
         book: {
           select: {
             id: true,
             name: true,
+            author: true,
+            description: true,
+            cover: true,
             createdAt: true,
             updatedAt: true,
           },
@@ -49,12 +52,7 @@ export class MeRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return {
-      books: userBooks.map(ub => ({
-        ...ub.book,
-        addedAt: ub.createdAt,
-      })),
-    };
+    return userBooks?.map(userBook => userBook.book) || [];
   }
 
   async addBookToUser(userId: string, bookId: string) {
@@ -68,6 +66,9 @@ export class MeRepository {
           select: {
             id: true,
             name: true,
+            author: true,
+            description: true,
+            cover: true,
             createdAt: true,
             updatedAt: true,
           },

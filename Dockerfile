@@ -1,11 +1,11 @@
-FROM node:20.9.0-alpine AS development
+FROM node:20-alpine AS development
+
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-COPY package-lock.json ./
 
-RUN npm install
+RUN npm ci --only=development
 
 COPY . .
 
