@@ -21,15 +21,13 @@ services:
       dockerfile: Dockerfile
       target: development
     restart: always
-    expose:
-      - ${PORT:-3000}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - ${PORT:-3000}:${PORT:-3000}
-      - 9229:9229
-      - 5556:5556
+      - ${PORT}:${PORT}
+    expose:
+      - ${PORT}
     env_file:
       - .env
     deploy:
